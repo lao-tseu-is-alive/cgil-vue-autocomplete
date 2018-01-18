@@ -1,0 +1,38 @@
+{
+  "name": "cgil-vue-autocomplete",
+  "version": "1.0.0",
+  "description": "A Vue.js Autocomplete Component to be used in Goeland",
+  "main": "dist/cgil-vue-autocomplete.js",
+  "scripts": {
+    "build": "poi build",
+    "webtest": "python -m SimpleHTTPServer",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete.git"
+  },
+  "keywords": [
+    "goeland",
+    "vue",
+    "component"
+  ],
+  "author": "cgil",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete/issues"
+  },
+  "homepage": "https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete#readme",
+  "devDependencies": {
+    "babel-preset-stage-2": "^6.24.1",
+    "bili": "^1.6.3",
+    "poi": "^9.6.12",
+    "rollup-plugin-vue": "^3.0.0",
+    "vue-template-compiler": "^2.5.13"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "cgil-html-utils": "^1.0.3",
+    "cgil-log": "^1.0.3"
+  }
+}
