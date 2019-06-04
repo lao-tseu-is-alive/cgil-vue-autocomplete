@@ -6,44 +6,51 @@ A Vue.js Autocomplete Component to be used in Goeland
 Install `cgil-vue-autocomplete` in the shell
 
 ```bash
-npm install cgil-vue-autocomplete --save
+npm i -P cgil-vue-autocomplete 
 ```
 
-Then import the vue component and use it !
+Then import the vue component and use it as usual in your ES6 javascript code (with a bundler)
+as explained here : https://cli.vuejs.org/guide/build-targets.html#app
 
-```javascript
-import 'cgil-vue-autocomplete/dist/cgil-vue-autocomplete.css'
-import cgilVueAutoComplete from 'cgil-vue-autocomplete'
 
-const DEV = process.env.NODE_ENV === 'development'
-const BASE_REST_API_URL = DEV ? 'https://mygolux.lausanne.ch/goapi/geo/' : '/goapi/geo/'
-
-export default {
-name: 'app',
-components: {
-  cgilVueAutoComplete
-},
-data: () => {
-  return {
-    adresse: null,
-    pays: null,    
-    geoCountryUrl: BASE_REST_API_URL + 'pays'
-  }
-}
-```
-
-and in your html template :
+Or directly inside an html page with the umd version of the lib
 
 ```html
-<cgil-vue-auto-complete
-  placeholder="choix du pays"
-  :ajax-data-source="geoCountryUrl"
-  :is-ajax-data-source-with-filter="false"
-  id-field-name="value"
-  v-model="pays"
->
-</cgil-vue-auto-complete>
+<meta charset="utf-8">
+<title>cgilVueAutoComplete demo</title>
+<script src="https://unpkg.com/vue"></script>
+<script src="./cgilVueAutoComplete.umd.min.js"></script>
+
+<link rel="stylesheet" href="./cgilVueAutoComplete.css">
+
+
+<div id="app">
+  <demo placeholder="choix du pays"
+        :ajax-data-source="geoCountryUrl"
+        :is-ajax-data-source-with-filter="false"
+        id-field-name="id"
+        v-model="pays"
+  />
+  <template v-if="pays !== null">
+    <p>Vous avez choisi le pays {{pays}}</p>
+  </template>
+</div>
+
+<script>
+new Vue({
+  components: {
+    demo: cgilVueAutoComplete
+  },
+  data: () => ({
+    adresse: null,
+    pays: null,
+    geoCountryUrl: 'https://go.trouvl.info/api/geo/pays',
+  }),
+}).$mount('#app')
+</script>
 ```
+
+
 
 
 ## Build Setup
