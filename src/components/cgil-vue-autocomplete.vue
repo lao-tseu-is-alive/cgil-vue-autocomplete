@@ -51,9 +51,7 @@
   import axios from 'axios'
   import {isNullOrUndefined, debounce} from 'cgil-html-utils/src/cgHtmlUtils'
   import Log from 'cgil-log'
-  // TODO ajouter case a cocher toute communes oui/non par defaut lausanne si on est sur RECOLTE
-  // TODO remove log in prod
-  const log = new Log('cgilVueAutoComplete', 2) // for now limit to warning and error
+    const log = new Log('', 2) // for now limit to warning and error
   const debounceDelay = 350 // in ms
   const minChars = 2
   // const cache = {}
