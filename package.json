@@ -7,6 +7,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "buildlib": "vue-cli-service build --target lib --name cgilVueAutoComplete ./src/components/cgil-vue-autocomplete.vue",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
