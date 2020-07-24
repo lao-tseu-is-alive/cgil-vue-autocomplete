@@ -9,7 +9,7 @@
       v-model="pays"
     />
     <template v-if="pays !== null">
-    <p>Cous avez choisi le pays {{pays}}</p>
+      <p>Cous avez choisi le pays {{pays}}</p>
     </template>
   </div>
 </template>
@@ -17,25 +17,23 @@
 <script>
 import cgilVueAutoComplete from './components/cgil-vue-autocomplete.vue';
 
-// const BASE_REST_API_URL = 'https://go.trouvl.info/api/geo/';
-const BASE_REST_API_URL = 'https://gcmobile.lausanne.ch/api/geo/';
-
+const BASE_REST_API_URL = 'https://golux.lausanne.ch/goapi/geo/';
 export default {
-  name: 'app',
+  name: 'App',
   components: {
     cgilVueAutoComplete,
   },
   data: () => ({
-      adresse: null,
-      pays: null,
-      geoCountryUrl: BASE_REST_API_URL + 'pays',
-    }),
+    adresse: null,
+    pays: null,
+    geoCountryUrl: `${BASE_REST_API_URL}pays`,
+  }),
 };
 </script>
 
-<style>
+<style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

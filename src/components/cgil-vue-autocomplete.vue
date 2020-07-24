@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len,no-lonely-if -->
 <template>
   <div>
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
@@ -30,15 +31,18 @@
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sbx-icon-search-6"></use>
           </svg>
         </button>
-        <button type="reset" @click="reset()" title="Effacer les critères de votre recherche" class="sbx-custom__reset">
+        <button type="reset" @click="reset()" title="Effacer les critères de votre recherche"
+                class="sbx-custom__reset">
           <svg role="img" aria-label="Reset">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sbx-icon-clear-5"></use>
           </svg>
         </button>
         <ul v-if="showSugestions" ref='suggestion' class="suggestion" tabindex="0">
           <template v-for="(result, key) in arrResults">
-            <li :key="key" :data="result.id" @click.prevent="itemSelected(result, $event)" class="suggestion-item"
-                :class="{'suggestionitem__selected' : isSelected(key) }">{{ result[labelFieldName] }}
+            <li :key="key" :data="result.id" @click.prevent="itemSelected(result, $event)"
+                class="suggestion-item"
+                :class="{'suggestionitem__selected' : isSelected(key) }">{{ result[labelFieldName]
+              }}
             </li>
           </template>
         </ul>
@@ -48,284 +52,293 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {isNullOrUndefined, debounce} from 'cgil-html-utils/src/cgHtmlUtils'
-  import Log from 'cgil-log'
-    const log = new Log('', 2) // for now limit to warning and error
-  const debounceDelay = 350 // in ms
-  const minChars = 2
-  // const cache = {}
-  axios.defaults.timeout = 4000
-  export default {
-    name: 'cgilVueAutoComplete',
-    components: {}, // end of components section
-    data: () => {
-      return {
-        searchText: '',
-        previousSearch: '',
-        selectedIndex: null,
-        isError: false,
-        errMsg: '',
-        selected: '',
-        isAjaxCallRunning: false,
-        showSugestions: false,
-        eventListener: null, // pour detecter click en dehor suggestion
-        arrAxiosSource: [],
-        arrAjaxResults: [], // when isAjaxDataSourceWithFilter is false we keep data here
-        arrResults: [{
-          id: 0,
-          label: 'aucun résultats trouvés...'
+import axios from 'axios';
+import { isNullOrUndefined, debounce } from 'cgil-html-utils/src/cgHtmlUtils';
+import Log from 'cgil-log';
 
-        }]
-      }
-    },  // end of data section
-    props: {
-      placeholder: {
-        type: String,
-        default: ''
-      },
-      idFieldName: {
-        type: String,
-        default: 'id'
-      },
-      labelFieldName: {
-        type: String,
-        default: 'label'
-      },
-      ajaxDataSource: {
-        type: String,
-        default: ''
-      },
-      isAjaxDataSourceWithFilter: {
-        type: Boolean,
-        default: true
-      }
-    }, // end of props section
-    watch: {
-      searchText: function (val) {
-        let search = val.trim()
-        // if (search !== this.selected) {
-        // new search begins so reset selected
-        // this.selected = ''
-        // this.selectedIndex = null
-        // }
-        if (this.isAjaxDataSourceWithFilter) {
-          if (search.length < minChars) {
-            this.arrResults = []
-          }
-          if (search !== this.previousSearch && this.selected.length < 1) {
-            this.previousSearch = search
-            if (search.length > minChars) {
-              this.getData(search)
-            }
-          } else {
-            // probably user pressed space
-            if (!this.showSugestions && (this.arrResults.length > 1)) {
-              this.showSugestions = true
-            }
+const log = new Log('', 2); // for now limit to warning and error
+const debounceDelay = 350; // in ms
+const minChars = 2;
+// const cache = {}
+axios.defaults.timeout = 4000;
+export default {
+  name: 'cgilVueAutoComplete',
+  components: {}, // end of components section
+  data: () => ({
+    searchText: '',
+    previousSearch: '',
+    selectedIndex: null,
+    isError: false,
+    errMsg: '',
+    selected: '',
+    isAjaxCallRunning: false,
+    showSugestions: false,
+    eventListener: null, // pour detecter click en dehor suggestion
+    arrAxiosSource: [],
+    arrAjaxResults: [], // when isAjaxDataSourceWithFilter is false we keep data here
+    arrResults: [{
+      id: 0,
+      label: 'aucun résultats trouvés...',
+
+    }],
+  }), // end of data section
+  props: {
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    idFieldName: {
+      type: String,
+      default: 'id',
+    },
+    labelFieldName: {
+      type: String,
+      default: 'label',
+    },
+    ajaxDataSource: {
+      type: String,
+      default: '',
+    },
+    isAjaxDataSourceWithFilter: {
+      type: Boolean,
+      default: true,
+    },
+  }, // end of props section
+  watch: {
+    searchText(val) {
+      const search = val.trim();
+      // if (search !== this.selected) {
+      // new search begins so reset selected
+      // this.selected = ''
+      // this.selectedIndex = null
+      // }
+      if (this.isAjaxDataSourceWithFilter) {
+        if (search.length < minChars) {
+          this.arrResults = [];
+        }
+        if (search !== this.previousSearch && this.selected.length < 1) {
+          this.previousSearch = search;
+          if (search.length > minChars) {
+            this.getData(search);
           }
         } else {
-          // here isAjaxDataSourceWithFilter = false
-          // so we are only filtering existing data with search criteria
-          if (search !== this.previousSearch) {
-            this.previousSearch = search
-            // 'Åland(les Îles) Châtæü éöà☀ … 山田太郎☯ ˵ĈĀŇĂƊǠ˶ ☺' => aland(les iles) chatæu eoa☀ … 山田太郎☯ ˵canaɗa˶ ☺
-            let searchNormalized = search.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-            this.arrResults = this.arrAjaxResults.filter(o => o[this.labelFieldName + '_normalized'].includes(searchNormalized))
+          // probably user pressed space
+          // eslint-disable-next-line
+          if (!this.showSugestions && (this.arrResults.length > 1)) {
+            this.showSugestions = true;
           }
         }
-      }
-    }, // end of watch section
-    created: function () {
-      log.t(`### created src: ${this.ajaxDataSource} , with filter? ${this.isAjaxDataSourceWithFilter}`)
-      if (!this.isAjaxDataSourceWithFilter) {
-        // we can load once the data from remote server and forget about it
-        this.getData()
-      }
-    }, // end of created section
-    mounted: function () {
-      log.t(`### mounted src: ${this.ajaxDataSource} , with filter? ${this.isAjaxDataSourceWithFilter}`)
-    }, // end of created section
-    methods: {
-      getData: debounce(function (query = '') {
-        var that = this
-        log.l(`## In getData debounce CALLBACK : "${query}"`)
-        if (that.arrAxiosSource.length > 0) {
-          that.arrAxiosSource.map(function (s) {
-            s.cancel()
-          })
-          that.arrAxiosSource = []
+      } else {
+        // here isAjaxDataSourceWithFilter = false
+        // so we are only filtering existing data with search criteria
+        // eslint-disable-next-line
+        if (search !== this.previousSearch) {
+          this.previousSearch = search;
+          const searchNormalized = search.normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+          this.arrResults = this.arrAjaxResults.filter((o) => o[`${this.labelFieldName}_normalized`].includes(searchNormalized));
+        } else {
+          // nothing
         }
-        var CancelToken = axios.CancelToken
-        var source = CancelToken.source()
-        that.arrAxiosSource.push(source)
-        that.arrResults = []
-        this.selectedIndex = null
-        that.isAjaxCallRunning = true
-        that.isError = false
-        axios.get(this.ajaxDataSource + query, {
-          cancelToken: source.token
-        }).then(function (response) {
-          log.l(`#### AJAX CALL SUCCESS: "${query}" => num results = ${response.data.length}`)
-          response.data.forEach(function (record) {
-            that.arrResults.push(record)
-          })
-          that.isAjaxCallRunning = false
+      }
+    },
+  }, // end of watch section
+  created() {
+    log.t(`### created src: ${this.ajaxDataSource} , with filter? ${this.isAjaxDataSourceWithFilter}`);
+    if (!this.isAjaxDataSourceWithFilter) {
+      // we can load once the data from remote server and forget about it
+      this.getData();
+    }
+  }, // end of created section
+  mounted() {
+    log.t(`### mounted src: ${this.ajaxDataSource} , with filter? ${this.isAjaxDataSourceWithFilter}`);
+  }, // end of created section
+  methods: {
+    getData: debounce(function (query = '') {
+      const that = this;
+      log.l(`## In getData debounce CALLBACK : "${query}"`);
+      if (that.arrAxiosSource.length > 0) {
+        // eslint-disable-next-line
+        that.arrAxiosSource.map((s) => {
+          s.cancel();
+        });
+        that.arrAxiosSource = [];
+      }
+      const { CancelToken } = axios;
+      const source = CancelToken.source();
+      that.arrAxiosSource.push(source);
+      that.arrResults = [];
+      this.selectedIndex = null;
+      that.isAjaxCallRunning = true;
+      that.isError = false;
+      axios.get(this.ajaxDataSource + query, {
+        cancelToken: source.token,
+      })
+        .then((response) => {
+          log.l(`#### AJAX CALL SUCCESS: "${query}" => num results = ${response.data.length}`);
+          response.data.forEach((record) => {
+            that.arrResults.push(record);
+          });
+          that.isAjaxCallRunning = false;
           if (that.arrResults.length > 0) {
             if (that.isAjaxDataSourceWithFilter) {
-              that.showSugestions = true
-              that.setEventListener()
+              that.showSugestions = true;
+              that.setEventListener();
             } else {
               that.arrAjaxResults = that.arrResults.map((val) => {
-                let o = {}
-                let labelNormalized = val[that.labelFieldName].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-                o[that.labelFieldName + '_normalized'] = labelNormalized
-                o[that.labelFieldName] = val[that.labelFieldName]
-                o[that.idFieldName] = val[that.idFieldName]
-                return o
-              })
+                const o = {};
+                const labelNormalized = val[that.labelFieldName].normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .toLowerCase();
+                o[`${that.labelFieldName}_normalized`] = labelNormalized;
+                o[that.labelFieldName] = val[that.labelFieldName];
+                o[that.idFieldName] = val[that.idFieldName];
+                return o;
+              });
             }
           }
-          that.isError = false
+          that.isError = false;
         })
-        .catch(function (thrown) {
+        .catch((thrown) => {
           if (axios.isCancel(thrown)) {
-            log.w(`#### AJAX CALL CANCELED : "${query}" : ${thrown.message}`)
+            log.w(`#### AJAX CALL CANCELED : "${query}" : ${thrown.message}`);
           } else {
-            log.e(`#### AJAX ERROR on GET  ${that.ajaxDataSource}${query}`, thrown)
-            that.errMsg = `Un problème est survenu pendant l'appel réseau AJAX sur : ${that.ajaxDataSource}${query} Message d'erreur reçu : ${thrown.message}`
+            log.e(`#### AJAX ERROR on GET  ${that.ajaxDataSource}${query}`, thrown);
+            that.errMsg = `Un problème est survenu pendant l'appel réseau AJAX sur : ${that.ajaxDataSource}${query} Message d'erreur reçu : ${thrown.message}`;
             if (!window.navigator.onLine) {
-              that.errMsg += 'EN CE MOMENT VOUS N\'AVEZ PAS DE RESEAU ! veuillez réessayez quand votre connexion sera rétablie '
+              that.errMsg += 'EN CE MOMENT VOUS N\'AVEZ PAS DE RESEAU ! veuillez réessayez quand votre connexion sera rétablie ';
             }
-            log.e(that.errMsg)
-            that.$emit('errorajax', that.errMsg)
-            that.isError = true
+            log.e(that.errMsg);
+            that.$emit('errorajax', that.errMsg);
+            that.isError = true;
           }
-          that.isAjaxCallRunning = false
-        })
-      }, debounceDelay), // end of getData
-      update: function (evt) {
-        log.t('#Update Event ==> key: ' + evt.key + ', query: "' + this.searchText + '"')
-        switch (evt.key) {
-          case 'ArrowDown':
+          that.isAjaxCallRunning = false;
+        });
+    }, debounceDelay), // end of getData
+    update(evt) {
+      log.t(`#Update Event ==> key: ${evt.key}, query: "${this.searchText}"`);
+      // eslint-disable-next-line
+      switch (evt.key) {
+        case 'ArrowDown':
           // this.$refs.suggestion.focus()
-        }
-      },
-      itemSelected: function (result, evt) {
-        log.t('## itemSelected', result, evt)
-        let tempObj = {}
-        if (!isNullOrUndefined(result)) {
-          tempObj = {...result}
-        } else {
-          tempObj[this.idFieldName] = evt.srcElement.data
-          tempObj[this.labelFieldName] = evt.srcElement.innerText
-        }
-        // Emit the selected value through the input event
-        this.$emit('input', tempObj)
-        this.searchText = tempObj[this.labelFieldName]
-        this.previousSearch = tempObj[this.labelFieldName]
-        // this.selected = tempObj[this.labelFieldName]
-        this.selectedIndex = null
-        log.l(` data selected is : ${tempObj[this.idFieldName]}`)
-        this.close()
-      },
-      isSelected: function (key) {
-        return key === this.selectedIndex
-      },
-      up: function () {
-        if (this.showSugestions) {
-          log.t(`## up  selectedIndex:${this.selectedIndex} hasVerticalScrollbar: ${this.hasVerticalScrollbar(this.$refs.suggestion)}`)
-          if (this.selectedIndex === 0) {
-            this.selectedIndex = this.arrResults.length - 1
-          } else {
-            this.selectedIndex = this.selectedIndex - 1
-            if (this.hasVerticalScrollbar(this.$refs.suggestion)) {
-              this.scrollVertical(this.$refs.suggestion, -1)
-            }
-          }
-        }
-      },
-      down: function () {
-        if (this.showSugestions) {
-          log.t(`## down   selectedIndex:${this.selectedIndex} hasVerticalScrollbar: ${this.hasVerticalScrollbar(this.$refs.suggestion)}`)
-          if (this.selectedIndex === null) {
-            this.selectedIndex = 0
-            return
-          }
-          if (this.selectedIndex === this.arrResults.length - 1) {
-            this.selectedIndex = 0
-          } else {
-            this.selectedIndex = this.selectedIndex + 1
-            if (this.hasVerticalScrollbar(this.$refs.suggestion) && this.selectedIndex > 5) {
-              this.scrollVertical(this.$refs.suggestion, 1)
-            }
-          }
-        }
-      },
-      enter: function () {
-        if (!isNullOrUndefined(this.selectedIndex)) {
-          this.itemSelected(this.arrResults[this.selectedIndex])
-        }
-      },
-      gotFocus: function () {
-        log.t('## gotFocus  ')
-        if (!this.isAjaxDataSourceWithFilter) {
-          this.showSugestions = true
-          this.setEventListener()
-        }
-      },
-      close: function () {
-        log.t('## close  ')
-        this.showSugestions = false
-        this.arrResults = []
-        this.removeEventListener()
-      },
-      reset: function () {
-        log.t('## reset  ')
-        this.searchText = ''
-        this.arrResults = []
-        // let tempObj = {}
-        // reset the selected value through the input event
-        this.$emit('input', null)
-      },
-      setEventListener: function () {
-        log.t('## setEventListener  ')
-        if (this.eventListener) {
-          return false
-        }
-        this.eventListener = true
-        document.addEventListener('click', this.clickOutsideListener, true)
-        return true
-      },
-      removeEventListener: function () {
-        log.t('## removeEventListener  :')
-        this.eventListener = false
-        document.removeEventListener('click', this.clickOutsideListener, true)
-      },
-      clickOutsideListener: function (evt) {
-        let test = (evt.target !== this.$refs.suggestion) && (evt.target !== this.$refs.search)
-        log.t('## clickOutsideListener  :', evt, evt.target, test)
-        if (test) {
-          this.close()
-        }
-      },
-      hasVerticalScrollbar: function (el) {
-        return el.scrollHeight > el.clientHeight
-      },
-      scrollVertical: function (el, numLines) {
-        log.t(`## scrollVertical  numLines: ${numLines}`)
-        log.l(`element scrollTop before: ${el.scrollTop}`)
-        let offsetY = el.children[0].clientHeight || 12
-        el.scrollTop += (numLines * offsetY)
-        log.l(`element scrollTop after : ${el.scrollTop}`)
       }
-    } // end of methods section
-  }
+    },
+    itemSelected(result, evt) {
+      log.t('## itemSelected', result, evt);
+      let tempObj = {};
+      if (!isNullOrUndefined(result)) {
+        tempObj = { ...result };
+      } else {
+        tempObj[this.idFieldName] = evt.srcElement.data;
+        tempObj[this.labelFieldName] = evt.srcElement.innerText;
+      }
+      // Emit the selected value through the input event
+      this.$emit('input', tempObj);
+      this.searchText = tempObj[this.labelFieldName];
+      this.previousSearch = tempObj[this.labelFieldName];
+      // this.selected = tempObj[this.labelFieldName]
+      this.selectedIndex = null;
+      log.l(` data selected is : ${tempObj[this.idFieldName]}`);
+      this.close();
+    },
+    isSelected(key) {
+      return key === this.selectedIndex;
+    },
+    up() {
+      if (this.showSugestions) {
+        log.t(`## up  selectedIndex:${this.selectedIndex} hasVerticalScrollbar: ${this.hasVerticalScrollbar(this.$refs.suggestion)}`);
+        if (this.selectedIndex === 0) {
+          this.selectedIndex = this.arrResults.length - 1;
+        } else {
+          this.selectedIndex -= 1;
+          if (this.hasVerticalScrollbar(this.$refs.suggestion)) {
+            this.scrollVertical(this.$refs.suggestion, -1);
+          }
+        }
+      }
+    },
+    down() {
+      if (this.showSugestions) {
+        log.t(`## down   selectedIndex:${this.selectedIndex} hasVerticalScrollbar: ${this.hasVerticalScrollbar(this.$refs.suggestion)}`);
+        if (this.selectedIndex === null) {
+          this.selectedIndex = 0;
+          return;
+        }
+        if (this.selectedIndex === this.arrResults.length - 1) {
+          this.selectedIndex = 0;
+        } else {
+          this.selectedIndex += 1;
+          if (this.hasVerticalScrollbar(this.$refs.suggestion) && this.selectedIndex > 5) {
+            this.scrollVertical(this.$refs.suggestion, 1);
+          }
+        }
+      }
+    },
+    enter() {
+      if (!isNullOrUndefined(this.selectedIndex)) {
+        this.itemSelected(this.arrResults[this.selectedIndex]);
+      }
+    },
+    gotFocus() {
+      log.t('## gotFocus  ');
+      if (!this.isAjaxDataSourceWithFilter) {
+        this.showSugestions = true;
+        this.setEventListener();
+      }
+    },
+    close() {
+      log.t('## close  ');
+      this.showSugestions = false;
+      this.arrResults = [];
+      this.removeEventListener();
+    },
+    reset() {
+      log.t('## reset  ');
+      this.searchText = '';
+      this.arrResults = [];
+      // let tempObj = {}
+      // reset the selected value through the input event
+      this.$emit('input', null);
+    },
+    setEventListener() {
+      log.t('## setEventListener  ');
+      if (this.eventListener) {
+        return false;
+      }
+      this.eventListener = true;
+      document.addEventListener('click', this.clickOutsideListener, true);
+      return true;
+    },
+    removeEventListener() {
+      log.t('## removeEventListener  :');
+      this.eventListener = false;
+      document.removeEventListener('click', this.clickOutsideListener, true);
+    },
+    clickOutsideListener(evt) {
+      const test = (evt.target !== this.$refs.suggestion) && (evt.target !== this.$refs.search);
+      log.t('## clickOutsideListener  :', evt, evt.target, test);
+      if (test) {
+        this.close();
+      }
+    },
+    hasVerticalScrollbar(el) {
+      return el.scrollHeight > el.clientHeight;
+    },
+    scrollVertical(el, numLines) {
+      log.t(`## scrollVertical  numLines: ${numLines}`);
+      log.l(`element scrollTop before: ${el.scrollTop}`);
+      const offsetY = el.children[0].clientHeight || 12;
+      // eslint-disable-next-line
+      el.scrollTop += (numLines * offsetY);
+      log.l(`element scrollTop after : ${el.scrollTop}`);
+    },
+  }, // end of methods section
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 
   input[type=text]::-ms-clear {
     display: none;

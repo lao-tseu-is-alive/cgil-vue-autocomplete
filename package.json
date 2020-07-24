@@ -3,10 +3,11 @@
   "version": "1.2.1",
   "description": "A Vue.js Autocomplete Component to be used in Goeland",
   "main": "dist/cgil-vue-autocomplete.js",
+  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "buildlib": "vue-cli-service build --target lib --name cgilVueAutoComplete ./src/components/cgil-vue-autocomplete.vue",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
   "repository": {
@@ -25,20 +26,25 @@
   },
   "homepage": "https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete#readme",
   "dependencies": {
-    "axios": "^0.19.0",
-    "cgil-html-utils": "^1.0.6",
-    "cgil-log": "^1.0.5",
-    "core-js": "^2.6.5",
-    "vue": "^2.6.10"
+    "axios": "^0.19.2",
+    "cgil-html-utils": "^1.0.9",
+    "cgil-log": "^2.0.2",
+    "core-js": "^3.6.5",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.8.0",
-    "@vue/cli-plugin-eslint": "^3.8.0",
-    "@vue/cli-service": "^3.8.0",
-    "@vue/eslint-config-airbnb": "^4.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "@vue/cli-plugin-babel": "~4.4.0",
+    "@vue/cli-plugin-eslint": "~4.4.0",
+    "@vue/cli-plugin-unit-jest": "~4.4.0",
+    "@vue/cli-service": "~4.4.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "@vue/test-utils": "^1.0.3",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.11"
   }
 }
