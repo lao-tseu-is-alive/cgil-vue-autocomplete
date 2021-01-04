@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cgil-html-utils": "^1.0.9",
     "cgil-log": "^2.0.2",
     "core-js": "^3.6.5",
