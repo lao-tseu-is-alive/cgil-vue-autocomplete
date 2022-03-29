@@ -27,24 +27,7 @@
   "homepage": "https://github.com/lao-tseu-is-alive/cgil-vue-autocomplete#readme",
   "dependencies": {
     "axios": "^0.26.1",
-    "cgil-html-utils": "^1.0.9",
-    "cgil-log": "^2.0.2",
-    "core-js": "^3.6.5",
-    "vue": "^2.6.11"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.4.0",
-    "@vue/cli-plugin-eslint": "^5.0.4",
-    "@vue/cli-plugin-unit-jest": "^5.0.4",
-    "@vue/cli-service": "^5.0.4",
-    "@vue/eslint-config-airbnb": "^5.0.2",
-    "@vue/test-utils": "^1.0.3",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "node-sass": "^7.0.1",
-    "sass-loader": "^12.6.0",
-    "vue-template-compiler": "^2.6.11"
+    "cgil-html-utils": "^2.0.4",
+    "cgil-log": "^3.0.1"
   }
 }
